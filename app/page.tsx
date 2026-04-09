@@ -1,65 +1,162 @@
-import Image from "next/image";
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { HeroVideo } from '@/components/features/hero/HeroVideo'
+import { MarqueeStrip } from '@/components/shared/MarqueeStrip/MarqueeStrip'
+import { ProjectCard } from '@/components/features/project/ProjectCard'
+import { StatCounter } from '@/components/features/stat/StatCounter'
+import { ArticleCard } from '@/components/features/article/ArticleCard'
+import { ScrollReveal } from '@/components/shared/ScrollReveal/ScrollReveal'
+import { getFeaturedProjects, getLatestArticles } from '@/lib/content'
+import { stats } from '@/data/stats'
+import { services } from '@/data/services'
+import { marqueeText } from '@/data/navigation'
+import { ArrowRight } from '@phosphor-icons/react/dist/ssr'
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: 'FL Bureau — Дизайн интерьера и архитектура',
+}
+
+export default function HomePage() {
+  const featuredProjects = getFeaturedProjects()
+  const latestArticles = getLatestArticles(3)
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <>
+      <HeroVideo />
+      <MarqueeStrip text={marqueeText} />
+
+      {/* Featured Projects */}
+      <section className="py-24 px-6 md:px-16">
+        <div className="container mx-auto">
+          <ScrollReveal className="mb-12 flex items-end justify-between">
+            <div>
+              <p className="text-label uppercase tracking-[0.12em] text-accent">Портфолио</p>
+              <h2 className="mt-2 font-heading text-h2 text-foreground">Избранные проекты</h2>
+            </div>
+            <Link
+              href="/portfolio"
+              className="hidden items-center gap-2 text-label uppercase tracking-[0.12em] text-muted transition-colors hover:text-accent md:flex"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Все проекты
+              <ArrowRight size={16} />
+            </Link>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProjects.map((project, i) => (
+              <ScrollReveal key={project.slug} delay={i * 0.08}>
+                <ProjectCard project={project} index={i} />
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <div className="mt-10 md:hidden">
+            <Link
+              href="/portfolio"
+              className="flex items-center gap-2 text-label uppercase tracking-[0.12em] text-muted transition-colors hover:text-accent"
             >
-              Learning
-            </a>{" "}
-            center.
+              Все проекты <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-20 px-6 bg-surface">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-2 gap-12 md:grid-cols-4">
+            {stats.map((stat, i) => (
+              <ScrollReveal key={stat.id} delay={i * 0.1}>
+                <StatCounter stat={stat} />
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services */}
+      <section className="py-24 px-6 md:px-16">
+        <div className="container mx-auto">
+          <ScrollReveal className="mb-12">
+            <p className="text-label uppercase tracking-[0.12em] text-accent">Услуги</p>
+            <h2 className="mt-2 font-heading text-h2 text-foreground max-w-xl">
+              Полный цикл — от идеи до авторского надзора
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {services.map((service, i) => (
+              <ScrollReveal key={service.id} delay={i * 0.08}>
+                <div className="group rounded-md border border-border p-8 transition-all duration-300 hover:border-accent hover:shadow-vibe-md">
+                  <span className="text-label uppercase tracking-[0.12em] text-accent">
+                    0{service.order}
+                  </span>
+                  <h3 className="mt-3 font-heading text-h3 text-foreground group-hover:text-accent transition-colors">
+                    {service.title}
+                  </h3>
+                  <p className="mt-3 text-sm text-muted line-clamp-2">{service.description}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <ScrollReveal className="mt-10">
+            <Link
+              href="/services"
+              className="flex items-center gap-2 text-label uppercase tracking-[0.12em] text-muted transition-colors hover:text-accent"
+            >
+              Подробнее об услугах <ArrowRight size={16} />
+            </Link>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Journal */}
+      {latestArticles.length > 0 && (
+        <section className="py-24 px-6 md:px-16 bg-surface">
+          <div className="container mx-auto">
+            <ScrollReveal className="mb-12 flex items-end justify-between">
+              <div>
+                <p className="text-label uppercase tracking-[0.12em] text-accent">Журнал</p>
+                <h2 className="mt-2 font-heading text-h2 text-foreground">Последние статьи</h2>
+              </div>
+              <Link
+                href="/journal"
+                className="hidden items-center gap-2 text-label uppercase tracking-[0.12em] text-muted transition-colors hover:text-accent md:flex"
+              >
+                Все статьи <ArrowRight size={16} />
+              </Link>
+            </ScrollReveal>
+
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              {latestArticles.map((article, i) => (
+                <ScrollReveal key={article.slug} delay={i * 0.08}>
+                  <ArticleCard article={article} />
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CTA */}
+      <section className="bg-surface-dark py-28 px-6 text-center">
+        <ScrollReveal>
+          <p className="text-label uppercase tracking-[0.12em] text-accent">Начнём?</p>
+          <h2 className="mt-4 font-heading text-h1 text-accent-foreground max-w-2xl mx-auto">
+            Расскажите нам о вашем проекте
+          </h2>
+          <p className="mt-6 text-body text-accent-foreground/60 max-w-lg mx-auto">
+            Ответим в течение рабочего дня. Первая консультация — бесплатно.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/contacts"
+            className="mt-10 inline-flex items-center gap-3 rounded-sm bg-accent px-8 py-4 text-label uppercase tracking-[0.12em] text-accent-foreground shadow-accent-glow transition-all duration-300 hover:bg-accent-light"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+            Оставить заявку <ArrowRight size={16} />
+          </Link>
+        </ScrollReveal>
+      </section>
+    </>
+  )
 }
