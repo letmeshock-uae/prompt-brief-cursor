@@ -2,10 +2,9 @@
 
 import { useRef, useEffect, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
 
-const HERO_POSTER = 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb3?w=1920&q=80'
+const HERO_POSTER = 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80'
 
 interface HeroVideoProps {
   headline?: string
@@ -34,63 +33,78 @@ export function HeroVideo({
   }, [])
 
   return (
-    <section ref={ref} className="relative h-screen overflow-hidden bg-[hsl(25_7%_15%)]">
-      {/* Parallax container */}
-      <motion.div className="absolute inset-0" style={{ y }}>
+    <section
+      ref={ref}
+      style={{ position: 'relative', height: '100vh', overflow: 'hidden', backgroundColor: '#2A2724' }}
+    >
+      {/* Parallax bg layer */}
+      <motion.div style={{ position: 'absolute', inset: 0, y }}>
 
-        {/* Poster — always visible until video loads */}
-        <Image
+        {/* Background photo — plain img, no Next.js optimization */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={HERO_POSTER}
-          alt="FL Bureau — дизайн интерьера"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+          }}
         />
 
-        {/* Video overlay once loaded */}
-        {videoLoaded && (
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover"
-          >
-            <source src="/videos/hero.mp4" type="video/mp4" />
-          </video>
-        )}
-
-        {/* Dark gradient overlay */}
-        <div
-          className="absolute inset-0"
+        {/* Video once it loads */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          onLoadedData={() => setVideoLoaded(true)}
           style={{
-            background: 'linear-gradient(to bottom, rgba(28,26,24,0.25) 0%, rgba(28,26,24,0.15) 40%, rgba(28,26,24,0.65) 100%)',
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: videoLoaded ? 1 : 0,
+            transition: 'opacity 0.7s ease',
+          }}
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
+
+        {/* Dark gradient */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(to bottom, rgba(28,26,24,0.2) 0%, rgba(28,26,24,0.1) 40%, rgba(28,26,24,0.65) 100%)',
           }}
         />
       </motion.div>
 
-      {/* Hidden video element to detect load */}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="hidden"
-        onLoadedData={() => setVideoLoaded(true)}
-      >
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
-
-      {/* Content */}
+      {/* Text content */}
       <motion.div
-        className="relative z-10 flex h-full flex-col items-start justify-end px-6 pb-20 md:px-16 md:pb-24"
-        style={{ opacity }}
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'flex-end',
+          height: '100%',
+          padding: '0 clamp(1.5rem, 5vw, 4rem) clamp(4rem, 8vh, 6rem)',
+          opacity,
+        }}
       >
         <motion.p
-          className="mb-4 text-label uppercase tracking-[0.12em] text-[color:hsl(0_0%_96%/0.6)]"
+          className="text-label uppercase text-[rgba(247,244,240,0.6)]"
+          style={{ marginBottom: '1rem', letterSpacing: '0.12em' }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
@@ -99,7 +113,8 @@ export function HeroVideo({
         </motion.p>
 
         <motion.h1
-          className="font-heading text-display text-accent-foreground whitespace-pre-line max-w-3xl leading-[1.02]"
+          className="font-heading text-display text-accent-foreground"
+          style={{ whiteSpace: 'pre-line', maxWidth: '48rem', lineHeight: 1.02 }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
@@ -108,7 +123,7 @@ export function HeroVideo({
         </motion.h1>
 
         <motion.div
-          className="mt-8 flex flex-wrap gap-4"
+          style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.0, ease: [0.25, 0.1, 0.25, 1] }}
@@ -121,7 +136,8 @@ export function HeroVideo({
           </Link>
           <Link
             href="/contacts"
-            className="inline-flex items-center gap-2 rounded-sm border border-[rgba(247,244,240,0.35)] px-6 py-3 text-label uppercase tracking-[0.12em] text-[#F7F4F0CC] transition-all duration-300 hover:border-accent hover:text-accent-foreground"
+            style={{ border: '1px solid rgba(247,244,240,0.35)' }}
+            className="inline-flex items-center gap-2 rounded-sm px-6 py-3 text-label uppercase tracking-[0.12em] text-[rgba(247,244,240,0.8)] transition-all duration-300 hover:text-accent-foreground"
           >
             Оставить заявку
           </Link>
@@ -130,13 +146,25 @@ export function HeroVideo({
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          opacity,
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.5 }}
-        style={{ opacity }}
       >
-        <div className="h-10 w-px bg-[rgba(247,244,240,0.3)] animate-pulse" />
+        <div
+          style={{
+            width: '1px',
+            height: '40px',
+            background: 'rgba(247,244,240,0.3)',
+            animation: 'pulse 2s infinite',
+          }}
+        />
       </motion.div>
     </section>
   )
